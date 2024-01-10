@@ -1,5 +1,4 @@
 import 'dart:ffi';
-
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -80,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
       page = FavouritesPage();
       break;
     case 2:
-      page = Placeholder();
+      page = LoginPage();
       break;
     default:
       throw UnimplementedError('no widget for $selectedIndex');
@@ -180,31 +179,121 @@ class FavouritesPage extends StatelessWidget{
   Widget build(BuildContext context){
     var appState = context.watch<MyAppState>();
     
- if (appState.favorites.isEmpty) {
+    if (appState.favorites.isEmpty) {
       return Center(
         child: Text('No favorites yet.'),
       );
     }
 
 
-  return ListView(
-    children: [
-      Card(
-        color: Colors.blueGrey,
-        child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text('Your favorites:'),
-      )
-      ),
-      for (var favorite in appState.favorites)
-        ListTile(
-            leading: Icon(Icons.favorite),
-            title: Text(favorite.asLowerCase),
-          ),
-    ],
-  );
+    return ListView(
+      children: [
+        Card(
+          color: Colors.blueGrey,
+          child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('Your favorites:'),
+        )
+        ),
+        for (var favorite in appState.favorites)
+          ListTile(
+              leading: Icon(Icons.favorite),
+              title: Text(favorite.asLowerCase),
+            ),
+        ],
+    );
     }
   }
+
+class LoginPage extends StatelessWidget{
+  @override
+  Widget build(BuildContext context){
+    var appState = context.watch<MyAppState>();
+
+    return MaterialApp(
+      title: 'Login Screen',
+      theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlueAccent),
+        ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Login Screen'),
+        ),
+        body: const MyCustomForm(),
+      ),
+    );
+
+  }
+}
+
+// Create a Form widget.
+class MyCustomForm extends StatefulWidget {
+  const MyCustomForm({super.key});
+
+  @override
+  MyCustomFormState createState() {
+    return MyCustomFormState();
+  }
+}
+
+// Create a corresponding State class.
+// This class holds data related to the form.
+class MyCustomFormState extends State<MyCustomForm> {
+  // Create a global key that uniquely identifies the Form widget
+  // and allows validation of the form.
+  //
+  // Note: This is a GlobalKey<FormState>,
+  // not a GlobalKey<MyCustomFormState>.
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    // Build a Form widget using the _formKey created above.
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter username';
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            // The validator receives the text that the user has entered.
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please enter password';
+              }
+              return null;
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                // Validate returns true if the form is valid, or false otherwise.
+                if (_formKey.currentState!.validate()) {
+                  // If the form is valid, display a snackbar. In the real world,
+                  // you'd often call a server or save the information in a database.
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Processing Data')),
+                  );
+                }
+              },
+              child: const Text('Submit'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class BigCard extends StatelessWidget {
   const BigCard({
